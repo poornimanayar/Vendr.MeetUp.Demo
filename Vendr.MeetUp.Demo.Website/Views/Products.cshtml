@@ -1,0 +1,33 @@
+﻿@using Vendr.Core
+@using Vendr.MeetUp.Demo.Core.Extensions
+@inherits UmbracoViewPage<Products>
+@{
+    Layout = "master.cshtml";
+}
+@Html.Partial("~/Views/Partials/SectionHeader.cshtml")
+<section class="section">
+
+    <div class="container">
+        <div class="product-grid">
+            @*only consider those products which are not product services, for eg gift wrapping*@
+            @foreach (var product in Model.Children<Product>().Where(p => !p.ProductServices).OrderBy(p => p.ProductName))
+            {
+                <a href="@product.Url" class="product-grid__item" style="background-image: url('@product.Photos.Url'); margin: 5px;">
+                    <div class="product-grid__item__overlay">
+                        <div class="product-grid__item__name">@product.ProductName</div>
+                        @if (product.HasVariants())
+                        {
+                            var samePrice = product.CheckWhetherVariantPricesSame();
+                            <div class="product-grid__item__price">@(!samePrice ? "From " : "") @(product.GetVariantPrices().First().Formatted())</div>
+                        }
+                        else
+                        {
+                            <div class="product-grid__item__price">@product.CalculatePrice().Formatted()</div>
+                        }
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+
+</section>

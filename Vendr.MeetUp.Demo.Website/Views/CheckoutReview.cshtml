@@ -1,0 +1,42 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.CheckoutReview>
+@using Vendr.Core.Web
+@using Vendr.MeetUp.Demo.Core.Extensions
+@using ContentModels = Vendr.MeetUp.Demo.CMSModels;
+@{
+	Layout = "CheckoutMaster.cshtml";
+	var checkoutPage = Model.GetCheckoutPage();
+	var cartPage = Umbraco.ContentSingleAtXPath("//home/cart");
+	var previousStep = checkoutPage.Children().TakeWhile(x => !x.Id.Equals(Model.Id)).LastOrDefault();
+	var nextStep = checkoutPage.Children().SkipWhile(x => !x.Id.Equals(Model.Id)).Skip(1).FirstOrDefault();
+}
+
+
+@Html.Partial("OrderInformationSummary")
+
+@using (Html.BeginPaymentForm(Model.Order))
+{
+	<div class="input-group">
+		<label>
+			<input id="acceptTerms" type="checkbox" value="1" class="mr-3"/>
+			<span class="font-medium">I agree and accept the sites terms of service</span>
+		</label>
+	</div>
+
+
+	<div class="row">
+		<div class="col-md-6" style="padding: 10px">
+			@if (previousStep != null)
+			{
+				<a href="@(previousStep.Url)" class="btn-checkout-step"><i class="fa fa-angle-left"></i> Return to @(previousStep.Name)</a>
+			}
+			else
+			{
+				<a href="@(cartPage.Url)" class="btn-checkout-step"><i class="fa fa-angle-left"></i> Return to Cart</a>
+			}
+		</div>
+		<div class="col-md-6">
+			<button id="continue" class="btn-checkout-step" type="submit" disabled="disabled">Continue to @(nextStep.Name)</button>
+		</div>
+
+	</div>
+}

@@ -1,0 +1,7 @@
+﻿@inherits UmbracoViewPage<int>
+
+@if (Model != default(int))
+{
+    <a href="@Umbraco.ContentSingleAtXPath("//home/cart").Url" class="nav-link button--border--solid"
+       style="max-width: 40%;padding: 5px 10px;">Cart (@Model)</a>
+}

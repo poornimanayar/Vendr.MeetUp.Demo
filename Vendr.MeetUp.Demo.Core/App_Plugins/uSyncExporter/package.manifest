@@ -1,0 +1,14 @@
+{
+  "javascript": [
+    "~/App_Plugins/uSyncExporter/exporter-840.js",
+    "~/App_Plugins/uSyncExporter/uSyncExportManager.js",
+    "~/App_Plugins/uSyncExporter/importController.js",
+    "~/App_Plugins/uSyncExporter/exportController.js",
+    "~/App_Plugins/uSyncExporter/uSyncExporterService.js",
+    "~/App_Plugins/uSyncExporter/exportDashboardController.js",
+    "~/App_Plugins/uSyncExporter/components/syncItemOptionsComponent.js"
+  ],
+  "css": [
+    "~/App_Plugins/uSyncExporter/uSyncExporter.css"
+  ]
+}

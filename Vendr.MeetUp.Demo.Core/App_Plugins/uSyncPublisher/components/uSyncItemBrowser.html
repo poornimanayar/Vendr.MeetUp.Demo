@@ -1,0 +1,67 @@
+﻿<div>
+    <div ng-if="vm.loading">
+        <umb-load-indicator></umb-load-indicator>
+    </div>
+        
+    <div ng-if="!vm.loading">
+        <umb-editor-sub-header>
+            <umb-editor-sub-header-content-left>
+                <ol class="usync-breadcrumb">
+                    <li ng-repeat="item in vm.breadcrumb">
+                        <a ng-click="vm.onBreadcrumbItem(item, $index)" class="btn btn-link">{{item.name}}</a>
+                    </li>
+                </ol>
+            </umb-editor-sub-header-content-left>
+        </umb-editor-sub-header>
+
+
+        <div class="umb-folder-grid" ng-if="vm.items.folders.length > 0">
+            <div class="umb-folder-grid__folder"
+                 ng-repeat="folder in vm.items.folders"
+                 ng-class="{'-selected': folder.selected}"
+                 ng-click="vm.onClickItem(folder, $event)">
+
+                <div class="umb-folder-grid__folder-description">
+                    <i class="usync-folder-grid__folder-icon icon-navigation-right" ng-if="folder.hasChildren"
+                       ng-click="vm.onClickItemName(folder, $event)"></i>
+                    <i class="umb-folder-grid__folder-icon {{folder.icon}}"></i>
+                    <div ng-click="vm.onClickItemName(folder, $event)"
+                         class="umb-folder-grid__folder-name">{{folder.name}}</div>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="umb-media-grid" ng-if="vm.items.nodes.length > 0">
+            <div class="umb-media-grid__item umb-outline umb-outline--surrounding"
+                 ng-repeat="item in vm.items.nodes"
+                 ng-class="{'-selected': item.selected}"
+                 ng-click="vm.onClickItem(item, $event)">
+
+                <!-- Check backgrund -->
+                <div class="umb-media-grid__image-background" ng-if="item.thumbnail || item.extension === 'svg'"></div>
+
+                <!-- Image thumbnail -->
+                <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="item.thumbnail" alt="{{item.name}}" draggable="false"
+                     src="{{item.thumbnail}}" />
+
+                <!-- SVG -->
+                <img class="umb-media-grid__item-image" width="{{item.width}}" height="{{item.height}}" ng-if="!item.thumbnail && item.extension === 'svg'" ng-src="{{item.image}}" alt="{{item.name}}" draggable="false" />
+
+                <!-- Transparent image - fallback - used to keep image proportions on wrapper-->
+                <img class="umb-media-grid__item-image-placeholder" ng-if="!item.thumbnail && item.extension !== 'svg'" src="assets/img/transparent.png" alt="{{item.name}}" draggable="false" />
+
+                <!-- Icon for files -->
+                <umb-file-icon ng-if="!item.thumbnail && item.extension !== 'svg'"
+                               class="umb-media-grid__item-file-icon"
+                               extension="{{item.extension}}"
+                               icon="{{item.icon}}"
+                               size="s">
+                </umb-file-icon>
+
+
+            </div>
+        </div>
+    </div>
+
+</div>

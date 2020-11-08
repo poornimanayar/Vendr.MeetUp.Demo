@@ -1,0 +1,31 @@
+﻿
+@using Vendr.MeetUp.Demo.Core.Extensions
+@inherits Umbraco.Web.Mvc.UmbracoViewPage<ICheckoutStep>
+@{
+    var checkoutPage = Model.GetCheckoutPage();
+    var cartPage = Umbraco.ContentSingleAtXPath("//home/cart");
+    var previousStep = checkoutPage.Children().TakeWhile(x => !x.Id.Equals(Model.Id)).LastOrDefault();
+    var nextStep = checkoutPage.Children().SkipWhile(x => !x.Id.Equals(Model.Id)).Skip(1).FirstOrDefault();
+}
+<div class="row">
+    @if (Model.CanGoBack)
+    {
+        <div class="col-md-6" style="padding: 10px">
+            @if (previousStep != null)
+            {
+                <a href="@(previousStep.Url)" class="btn-checkout-step"><i class="fa fa-angle-left"></i> Return to @(previousStep.Name)</a>
+            }
+            else
+            {
+                <a href="@(cartPage.Url)" class="btn-checkout-step"><i class="fa fa-angle-left"></i> Return to Cart</a>
+            }
+        </div>
+    }
+    @if (nextStep != null)
+    {
+        <div class="col-md-6">
+            <button type="submit" class="btn-checkout-step">Continue to @(nextStep.Name) &gt;&gt;</button>
+        </div>
+    }
+</div>
+

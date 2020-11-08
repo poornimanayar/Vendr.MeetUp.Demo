@@ -1,0 +1,148 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.CheckoutPersonalInformation>
+@using Vendr.MeetUp.Demo.Core.Controllers
+@using Vendr.MeetUp.Demo.Core.Extensions
+@using ContentModels = Vendr.MeetUp.Demo.CMSModels;
+@{
+    Layout = "CheckoutMaster.cshtml";
+    var checkoutPage = Model.GetCheckoutPage();
+    var nextStep = checkoutPage.Children().SkipWhile(x => !x.Id.Equals(Model.Id)).Skip(1).FirstOrDefault();
+}
+
+@using (Html.BeginUmbracoForm<CheckoutSurfaceController>("UpdateOrderCustomerInformation", FormMethod.Post))
+{
+    <div class="row">
+        <input type="hidden" name="nextStep" value="@(nextStep?.Id)"/>
+        <div class="col-md-12">
+            <h3 class="text-xl font-medium mb-4">Contact Information</h3>
+            <fieldset>
+                <div class="input-group">
+                    <input name="email" type="email" placeholder="Email" value="@(Model.Order.CustomerInfo.Email)" required/>
+                </div>
+                <label class="flex items-center mb-2  cursor-pointer">
+                    <input name="marketingOptIn" type="checkbox" value="true" class="mr-2" @Html.Raw(Model.Order.Properties["marketingOptIn"] == "1" ? "checked=\"checked\"" : "")/> Keep me up to date on news and exclusive offers
+                </label>
+            </fieldset>
+        </div>
+        <div class="col-md-6">
+            <h3 class="text-xl font-medium mb-4 mt-8">Billing Address</h3>
+            <fieldset>
+                <div class="input-group">
+                    <input name="billingAddress.Firstname" type="text" placeholder="First name" value="@(Model.Order.CustomerInfo.FirstName)" required/>
+                </div>
+                <div class="input-group">
+                    <input name="billingAddress.Lastname" type="text" placeholder="Last name"value="@(Model.Order.CustomerInfo.LastName)" required/>
+                </div>
+                <div class="input-group">
+                    <input name="billingAddress.Line1" type="text" placeholder="Address (line 1)" value="@(Model.Order.Properties["billingAddressLine1"])" required/>
+                </div>
+                <div class="input-group">
+                    <input name="billingAddress.Line2" type="text" placeholder="Address (line 2)" value="@(Model.Order.Properties["billingAddressLine2"])"/>
+                </div>
+                <div class="input-group">
+                    <input name="billingAddress.City" type="text" placeholder="City" value="@(Model.Order.Properties["billingCity"])" required/>
+                </div>
+                <div class="input-group">
+                    <select name="billingAddress.Country" placeholder="Country">
+                        @foreach (var country in Model.Countries)
+                        {
+                            <option value="@(country.Id)" @Html.Raw(Model.Order.PaymentInfo.CountryId == country.Id ? "selected=\"selected\"" : "")>@(country.Name)</option>
+                        }
+                    </select>
+                </div>
+                <div class="input-group">
+                    <input name="billingAddress.ZipCode" type="text" placeholder="Postcode" value="@(Model.Order.Properties["billingZipCode"])" required/>
+                </div>
+                <div class="input-group">
+                    <input name="billingAddress.Telephone" type="text" placeholder="Phone" value="@(Model.Order.Properties["billingTelephone"])"/>
+                </div>
+                <label class="flex items-center mb-2 cursor-pointer">
+                    <input name="shippingSameAsBilling" type="checkbox" value="true" @Html.Raw(Model.Order.Properties["shippingSameAsBilling"] == "1" || !Model.Order.Properties.ContainsKey("shippingSameAsBilling") ? "checked=\"checked\"" : "")/> Shipping address is same as billing address
+                </label>
+            </fieldset>
+        </div>
+        <div class="col-md-6">
+            <div id="shipping-info" style="display: none;">
+                <h3 class="text-xl font-medium mb-4 mt-8">Shipping Address</h3>
+                <fieldset>
+                    <div class="input-group">
+                        <input name="shippingAddress.Firstname" type="text" placeholder="First name" value="@(Model.Order.Properties["shippingFirstName"])"/>
+                    </div>
+                    <div class="input-group">
+                        <input name="shippingAddress.Lastname" type="text" placeholder="Last name" value="@(Model.Order.Properties["shippingLastName"])"/>
+                    </div>
+                    <div class="input-group">
+                        <input name="shippingAddress.Line1" type="text" placeholder="Address (line 1)" value="@(Model.Order.Properties["shippingAddressLine1"])"/>
+                    </div>
+                    <div class="input-group">
+                        <input name="shippingAddress.Line2" type="text" placeholder="Address (line 2)" value="@(Model.Order.Properties["shippingAddressLine2"])"/>
+                    </div>
+                    <div class="input-group">
+                        <input name="shippingAddress.City" type="text" placeholder="City" value="@(Model.Order.Properties["shippingCity"])"/>
+                    </div>
+                    <div class="input-group">
+                        <select name="shippingAddress.Country" placeholder="Country">
+                            @foreach (var country in Model.Countries)
+                            {
+                                <option value="@(country.Id)" @Html.Raw(Model.Order.PaymentInfo.CountryId == country.Id ? "selected=\"selected\"" : "")>@(country.Name)</option>
+                            }
+                        </select>
+                        <input name="shippingAddress.ZipCode" type="text" placeholder="Postcode" value="@(Model.Order.Properties["shippingZipCode"])"/>
+                    </div>
+                    <div class="input-group">
+                        <input name="shippingAddress.Telephone" type="text" placeholder="Phone" value="@(Model.Order.Properties["shippingTelephone"])"/>
+
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <label class="flex items-center mb-2 cursor-pointer">
+                <input name="giftWrap" value="true" type="checkbox" @Html.Raw(Model.Order.Properties["giftWrap"] == "1" ? "checked=\"checked\"" : "")/> Gift wrap it!
+            </label>
+            <div id="giftMessageInput" style="display: none;">
+                <div class="input-group">
+                    <textarea name="giftMessage" rows="8" cols="30" placeholder="Gift Message">@(Model.Order.Properties["giftMessage"])</textarea>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <h3 class="text-xl font-medium mb-4 mt-8">Comments</h3>
+            <textarea name="comments" rows="8" cols="30" placeholder="Enter any comments here">@(Model.Order.Properties["comments"])</textarea>
+        </div>
+    </div>
+    @Html.Partial("CheckoutPrevNext")
+}
+
+@section aside
+{
+    @using (Html.BeginUmbracoForm<CheckoutSurfaceController>("ApplyDiscount", FormMethod.Post))
+    {
+        <fieldset>
+            <div class="input-group">
+                <input name="discountCode" placeholder="Discount/ Gift card code" required/>
+            </div>
+            <button type="submit">Apply</button>
+        </fieldset>
+    }
+    @if (Model.Order.DiscountCodes.Count > 0 || Model.Order.GiftCards.Count > 0)
+    {
+        <ul class="mt-4 block">
+            @foreach (var discountCode in Model.Order.DiscountCodes)
+            {
+                <li class="inline-block mr-2">
+                    <a href="@Url.SurfaceAction("RemoveDiscount", "CheckoutSurface", new {discountCode = discountCode.Code})">
+                        <i class="fa fa-times mr-1"></i> @discountCode.Code
+                    </a>
+                </li>
+            }
+            @foreach (var giftCard in Model.Order.GiftCards)
+            {
+                <li class="inline-block mr-2">
+                    <a href="@Url.SurfaceAction("RemoveDiscount", "CheckoutSurface", new {discountCode = giftCard.Code})">
+                        <i class="fa fa-times mr-1"></i> @giftCard.Code
+                    </a>
+                </li>
+            }
+        </ul>
+    }
+}

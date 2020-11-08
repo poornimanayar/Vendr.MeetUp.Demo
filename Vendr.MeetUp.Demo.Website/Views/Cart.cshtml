@@ -1,0 +1,171 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<Cart>
+@using Vendr.Core
+@using Vendr.MeetUp.Demo.Core.Controllers
+@using ContentModels = Vendr.MeetUp.Demo.CMSModels;
+@{
+    Layout = "master.cshtml";
+    var member = Umbraco.MemberIsLoggedOn()? Members.CurrentUserName : null;
+
+}
+<!-- for the section we want to show the shop header -->
+@Html.Partial("~/Views/Partials/SectionHeader.cshtml", Model.Parent)
+<section class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                @if (Model.Order != null && Model.Order.TotalQuantity != 0)
+                {
+                    @Html.GetGridHtml(Model, "bodyText", "bootstrap3-fluid")
+                    <div class="table-container">
+                         @using (Html.BeginUmbracoForm<CartSurfaceController>
+                             ("UpdateCart", FormMethod.Post))
+                         {
+                            <table class="table table-responsive">
+                                <thead>
+                                <th style="text-align:left">
+                                    Image
+                                </th>
+                                <th style="text-align:left">
+                                    Product
+                                </th>
+                                <th style="text-align:left">
+                                    Price
+                                </th>
+                                <th style="text-align:left">
+                                    Quantity
+                                </th>
+                                <th style="text-align:left">
+                                    Total
+                                </th>
+                                <th></th>
+                                </thead>
+                                <tbody>
+                                @* loop through the orderlines and add an index *@
+                                @foreach (var item in Model.Order.OrderLines.Select((ol, i) => new {OrderLine = ol, Index = i}))
+                                {
+                                    // get the node
+                                    var node = Umbraco.Content(Guid.Parse(item.OrderLine.ProductReference));
+
+                                    //get the product node
+                                    var product = node.ContentType.Alias == Product.ModelTypeAlias ? (Product) node : (Product) node.Parent;
+
+                                    //get the product variant node
+                                    var productVariant = node.ContentType.Alias == ProductVariant.ModelTypeAlias ? (ProductVariant) node : null;
+
+                                    //get the display name in the format product name - variant name (sku)/ product name (sku)
+                                    var displayName = productVariant != null ? string.Concat(product.ProductName, "- ", productVariant.Name, "(", productVariant.Sku, ")") : string.Concat(product.ProductName, "(", product.Sku, ")");
+
+                                    <tr>
+                                        <td style="width: 20%;text-align: left">
+                                            <img src="@Url.GetCropUrl(product.Photos.Url, 100, 100)"/>
+                                        </td>
+                                        <td style="width: 40%;text-align: left">
+                                            <span style="width: 100%">@displayName</span>
+                                        </td>
+                                        <td style="width: 10%;text-align: left">
+                                            @* unit price without discounts *@
+                                            <span>@item.OrderLine.UnitPrice.WithoutDiscounts.Formatted()</span>
+                                        </td>
+                                        <td style="width: 12%;text-align: left">
+                                            @Html.Hidden($"orderLines[{item.Index}].LineItemId", item.OrderLine.Id)
+                                            @Html.TextBox($"orderLines[{item.Index}].Quantity", item.OrderLine.Quantity.Normalize(), new {type = "number", @class = "input-sm"})
+                                        </td>
+                                        <td style="width: 10%;text-align: left">
+                                            @* show total price without discounts *@
+                                            <span> @item.OrderLine.TotalPrice.WithoutDiscounts.Formatted()</span>
+                                        </td>
+                                        <td style="width: 5%;text-align: left">
+                                            <a href="@(Url.SurfaceAction<CartSurfaceController>("RemoveFromCart", new {OrderLineId = item.OrderLine.Id, ProductName = displayName}))">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                                <tr style="border-top:solid 1px #666;border-bottom:solid 1px #666">
+
+                                    <td colspan="1">
+                                        &nbsp;
+                                    </td>
+                                    <td colspan="3">
+                                        <h3>Total Cost</h3>
+                                    </td>
+                                    <td colspan="2">
+                                        @* total price of the order without discounts *@
+                                        <span>@Model.Order.TotalPrice.WithoutDiscounts.Formatted()</span>
+                                    </td>
+                                </tr>
+                                <tr>
+
+                                    <td colspan="4">&nbsp;</td>
+
+                                    <td colspan="2">
+                                        &nbsp;
+                                    </td>
+                                </tr>
+                                <tr>
+
+                                    <td>
+                                        <a class="button btn-danger" href="@(Url.SurfaceAction<CartSurfaceController>("EmptyCart"))">
+                                            <span class="icon">
+                                                <i class="fas fa-minus-circle"></i>
+                                            </span>
+                                            <span>
+                                                Empty cart
+                                            </span>
+                                        </a>
+                                    </td>
+                                    <td colspan="2">&nbsp;</td>
+                                    <td>
+                                        <button class="button btn-update" type="submit">
+                                            <span class="icon">
+                                                <i class="fas fa-sync"></i>
+                                            </span>
+                                            <span>Update</span>
+                                        </button>
+                                    </td>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                        <a class="button btn-action" href="@Umbraco.ContentSingleAtXPath("//home/checkout").Url">
+                                            <span class="icon">
+                                                <i class="fas fa-shopping-basket"></i>
+                                            </span>
+                                            <span>Checkout</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                         } 
+                    </div>
+                }
+                else
+                {
+                    <p>You shopping cart is empty.</p>
+                    <a class="button button--border--solid" href="@Umbraco.ContentSingleAtXPath("//home/products").Url">
+                        View all products
+                    </a>
+                }
+            </div>
+        </div>
+
+       @if (member == null)
+       {
+           <div class="table-container">
+               <table class="table table-responsive checkout-table">
+                   <tr>
+                       <td colspan="3">&nbsp;</td>
+                       <td colspan="2" style="float: right">
+                           Or register to earn member discount..
+                           <a class="button btn-action" href="@Umbraco.ContentSingleAtXPath("//home/register").Url">
+                               <span class="icon">
+                                   <i class="fas fa-user"></i>
+                               </span>
+                               <span>Register</span>
+                           </a>
+                       </td>
+                   </tr>
+               </table>
+           </div>
+       }
+    </div>
+</section>

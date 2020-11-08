@@ -1,0 +1,153 @@
+﻿@using Umbraco.Web
+@using Umbraco.Web.Models
+@using Vendr.Core
+@using Vendr.MeetUp.Demo.Core.Extensions
+@inherits UmbracoViewPage<ICheckoutStep>
+@{
+    Layout = "_layout.cshtml";
+    
+    //extension method(specific to the soln) to get the checkout page
+    var checkOutPage = Model.GetCheckoutPage();
+    
+    //extension method(specific to the soln) to get the checkout step pages
+    var checkOutSteps = checkOutPage.GetCheckoutSteps();
+    
+    //extension method(specific to the soln) to get the current order
+    var order = Model.GetCurrentOrder();
+    var passedStep = false;
+}
+<section class="checkout-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-push-4 col-md-8">
+                <img src="@Url.GetCropUrl(checkOutPage.CheckoutLogo, 150, 150, imageCropMode: ImageCropMode.Max)"/>
+            </div>
+            @* checkout progress *@
+            <div class="col-md-12 checkout-progress">
+                @foreach (var checkoutStep in checkOutSteps.Select((s, i) => new {Step = s, Index = i}))
+                {
+                    if (checkoutStep.Index > 0)
+                    {
+                        <i class="fa fa-angle-right text-gray-500 pr-2"></i>
+                    }
+                    if (!passedStep && Model.Id != checkoutStep.Step.Id && Model.CanGoBack)
+                    {
+                        <a class="nav-link" href="@checkoutStep.Step.Url">@checkoutStep.Step.StepName</a>
+                    }
+                    else
+                    {
+                        <span>@checkoutStep.Step.StepName</span>
+                    }
+                    passedStep = passedStep || checkoutStep.Step.Id == Model.Id;
+                }
+            </div>
+        </div>
+    </div>
+    <div class="container checkout-container">
+        <div class="row">
+            <div class="col-md-8">
+                @RenderBody()
+            </div>
+
+            <div class="col-md-4">
+                @RenderSection("aside", false)
+                @if (Model.ContentType.Alias != CheckoutConfirmation.ModelTypeAlias)
+                {
+                    <table class="table checkout-table">
+                        @* loop through order line and write the items and cost out *@
+                        @foreach (var orderLine in order.OrderLines)
+                        {
+                            <tr>
+                                <td>@orderLine.Name </td>
+                                <td>@orderLine.Quantity.Normalize()</td>
+                                <td>@orderLine.UnitPrice.WithoutDiscounts.Formatted()</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td colspan="2">
+                                <strong>
+                                    <em>Subtotal</em>
+                                </strong>
+                            </td>
+                            <td>@order.SubtotalPrice.WithoutDiscounts.Formatted()</td>
+                        </tr>
+                        @if (order.GetShippingMethod() != null)
+                        {
+                            <tr>
+                                <td colspan="2">
+                                    <strong>
+                                        <em>Shipping via @order.GetShippingMethod().Name</em>
+                                    </strong>
+                                </td>
+                                <td>@order.ShippingInfo.TotalPrice.WithoutDiscounts.Formatted()</td>
+                            </tr>
+                        }
+                        @if (order.GetPaymentMethod() != null && order.GetPaymentMethod().Alias != "zeroValue")
+                        {
+                            <tr>
+                                <td colspan="2">
+                                    <strong>
+                                        <em>Payment via @order.GetPaymentMethod().Name</em>
+                                    </strong>
+                                </td>
+                                <td>@order.PaymentInfo.TotalPrice.WithoutDiscounts.Formatted()</td>
+                            </tr>
+                        }
+                        @if (order.SubtotalPrice.TotalDiscount > 0)
+                        {
+                            <tr>
+                                <td colspan="2">
+                                    <strong>
+                                        <em>Total Discount</em>
+                                    </strong>
+                                </td>
+                                <td>@order.SubtotalPrice.TotalDiscount.Formatted()</td>
+                            </tr>
+                        }
+                        @if (order.ShippingInfo.TotalPrice.Discount > 0)
+                        {
+                            <tr>
+                                <td colspan="2">
+                                    <strong>
+                                        <em>Shipping Discount</em>
+                                    </strong>
+                                </td>
+                                <td>@order.ShippingInfo.TotalPrice.Discount.Formatted()</td>
+                            </tr>
+                        }
+
+                        @if (order.TotalPrice.GiftCardsAmount.Value > 0)
+                        {
+                            foreach (var giftCard in order.GiftCards)
+                            {
+                                <tr>
+                                    <td colspan="2">
+                                        <strong>
+                                            <em>Gift Card(@giftCard.Code)</em>
+                                        </strong>
+                                    </td>
+                                    <td>@giftCard.Amount.Formatted()</td>
+                                </tr>
+                            }
+                        }
+                        <tr>
+                            <td colspan="2">
+                                <strong>Total Price Without Discount</strong>
+                            </td>
+                            <td>@order.TotalPrice.Value.Formatted()</td>
+                        </tr>
+                        @if (order.Discounts.Any())
+                        {
+                            <tr>
+                                <td colspan="2">
+                                    <strong>Total Price</strong>
+                                </td>
+                                <td>@order.TotalPrice.WithDiscounts.Formatted()</td>
+                            </tr>
+                        }
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</section>

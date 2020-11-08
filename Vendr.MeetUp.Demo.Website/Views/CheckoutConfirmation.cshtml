@@ -1,0 +1,35 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.CheckoutConfirmation>
+@using ContentModels = Vendr.MeetUp.Demo.CMSModels;
+@{
+	Layout = "CheckoutMaster.cshtml";
+}
+
+<div class="border border-gray-300 p-6 rounded mb-8 text-center">
+	<span class="inline-flex items-center justify-center text-6xl border-2 border-green-500 rounded-full mb-4 w-24 h-24"><i class="fa fa-check text-green-500"></i></span>
+	<h3 class="text-xl font-medium mb-4">Thank you for your order #@(Model.Order.OrderNumber ?? Model.Order.CartNumber)</h3>
+	<p class="mb-4">A confirmation email has been sent to <strong>@(Model.Order.CustomerInfo.Email)</strong></p>
+	<p><a href="/" >Return to Store</a></p>
+</div>
+
+<div class="border border-gray-300 p-6 rounded mb-8">
+	<h3 class="text-xl font-medium mb-4">Contact Information</h3>
+	<p class="mb-4">@Model.Order.CustomerInfo.Email</p>
+	<div class="row">
+		<div class="col-md-6">
+			<h3 class="text-xl font-medium mb-4">Billing Information</h3>
+			<p class="">
+				<strong>@Model.Order.CustomerInfo.FirstName @Model.Order.CustomerInfo.LastName</strong>
+				<br/>
+				@Html.Raw(string.Join("<br />", new string[] {Model.Order.Properties["billingAddressLine1"], Model.Order.Properties["billingAddressLine2"], Model.Order.Properties["billingCity"], Model.PaymentCountry.Name, Model.Order.Properties["billingZipCode"]}.Where(x => !x.IsNullOrWhiteSpace())))
+			</p>
+		</div>
+		<div class="col-md-6">
+			<h3 class="text-xl font-medium mb-4">Shipping Information</h3>
+			<p class="">
+				<strong>@Model.Order.Properties["shippingFirstName"] @Model.Order.Properties["shippingLastName"]</strong>
+				<br/>
+				@Html.Raw(string.Join("<br />", new string[] {Model.Order.Properties["shippingAddressLine1"], Model.Order.Properties["shippingAddressLine2"], Model.Order.Properties["shippingCity"], Model.ShippingCountry.Name, Model.Order.Properties["shippingZipCode"]}.Where(x => !x.IsNullOrWhiteSpace())))
+			</p>
+		</div>
+	</div>
+</div>

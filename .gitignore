@@ -1,0 +1,24 @@
+
+.idea/
+
+.vs/
+
+packages/
+
+Vendr.MeetUp.Demo.Core/bin/
+
+Vendr.MeetUp.Demo.Core/obj/
+
+Vendr.MeetUp.Demo/bin/
+
+Vendr.MeetUp.Demo/obj/
+
+Vendr.MeetUp.Demo/My Project/
+
+*.user
+
+Vendr.MeetUp.Demo.Website/bin/
+
+Vendr.MeetUp.Demo.Website/obj/
+
+Vendr.MeetUp.Demo.Website/Umbraco/

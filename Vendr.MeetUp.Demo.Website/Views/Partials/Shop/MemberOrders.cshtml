@@ -1,0 +1,26 @@
+﻿@using Vendr.Core
+@using Vendr.Core.Models
+@inherits UmbracoViewPage<IEnumerable<Vendr.Core.Models.OrderReadOnly>>
+
+@if (Model != null && Model.Any())
+{
+    <table class="checkout-table">
+        <thead>
+        <tr>
+            <th>Order Number</th>
+            <th>Order Date</th>
+            <th>Total Price</th>
+            <th>Order Status</th>
+        </tr>
+        </thead>
+        @foreach (var order in Model)
+        {
+            <tr>
+                <td>@order.OrderNumber</td>
+                <td>@order.FinalizedDate.Value.ToString("dd/MM/yyyy")</td>
+                <td>@order.TotalPrice.WithDiscounts.Formatted()</td>
+                <td>@(!order.Properties.ContainsKey("shippingStatus") ? "Not available" : order.Properties["shippingStatus"].Value.ToString())</td>
+            </tr>
+        }
+    </table>
+}
