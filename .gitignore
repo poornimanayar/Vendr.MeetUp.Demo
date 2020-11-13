@@ -22,3 +22,11 @@ Vendr.MeetUp.Demo.Website/bin/
 Vendr.MeetUp.Demo.Website/obj/
 
 Vendr.MeetUp.Demo.Website/Umbraco/
+
+Vendr.MeetUp.Demo.Web/bin/
+
+Vendr.MeetUp.Demo.Web/App_Data/Logs/
+
+Vendr.MeetUp.Demo.Web/App_Data/TEMP/
+
+Vendr.MeetUp.Demo.Web/obj/
