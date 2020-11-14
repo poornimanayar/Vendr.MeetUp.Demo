@@ -19,92 +19,106 @@ using Umbraco.ModelsBuilder.Embedded;
 
 namespace Vendr.MeetUp.Demo.CMSModels
 {
-	/// <summary>Contact</summary>
-	[PublishedModel("contact")]
-	public partial class Contact : PublishedContentModel, INavigationBase
+	/// <summary>Some Other Product Type</summary>
+	[PublishedModel("someOtherProductType")]
+	public partial class SomeOtherProductType : PublishedContentModel, IProductConfig
 	{
 		// helpers
 #pragma warning disable 0109 // new is redundant
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
-		public new const string ModelTypeAlias = "contact";
+		public new const string ModelTypeAlias = "someOtherProductType";
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
 		public new const PublishedItemType ModelItemType = PublishedItemType.Content;
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
 		public new static IPublishedContentType GetModelContentType()
 			=> PublishedModelUtility.GetModelContentType(ModelItemType, ModelTypeAlias);
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
-		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<Contact, TValue>> selector)
+		public static IPublishedPropertyType GetModelPropertyType<TValue>(Expression<Func<SomeOtherProductType, TValue>> selector)
 			=> PublishedModelUtility.GetModelPropertyType(GetModelContentType(), selector);
 #pragma warning restore 0109
 
 		// ctor
-		public Contact(IPublishedContent content)
+		public SomeOtherProductType(IPublishedContent content)
 			: base(content)
 		{ }
 
 		// properties
 
 		///<summary>
-		/// Pick a Contact Form: If Umbraco Forms is installed you'll be able to select a form
+		/// Content
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
-		[ImplementPropertyType("contactForm")]
-		public string ContactForm => this.Value<string>("contactForm");
+		[ImplementPropertyType("bodyText")]
+		public global::Newtonsoft.Json.Linq.JToken BodyText => this.Value<global::Newtonsoft.Json.Linq.JToken>("bodyText");
 
 		///<summary>
-		/// Contact Form Header
+		/// Category
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
-		[ImplementPropertyType("contactFormHeader")]
-		public string ContactFormHeader => this.Value<string>("contactFormHeader");
+		[ImplementPropertyType("category")]
+		public global::System.Collections.Generic.IEnumerable<string> Category => this.Value<global::System.Collections.Generic.IEnumerable<string>>("category");
 
 		///<summary>
-		/// Contact Intro
+		/// Description
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
-		[ImplementPropertyType("contactIntro")]
-		public global::System.Web.IHtmlString ContactIntro => this.Value<global::System.Web.IHtmlString>("contactIntro");
+		[ImplementPropertyType("description")]
+		public string Description => this.Value<string>("description");
 
 		///<summary>
-		/// Map Coordinates
+		/// Features
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
-		[ImplementPropertyType("mapCoordinates")]
-		public object MapCoordinates => this.Value("mapCoordinates");
+		[ImplementPropertyType("features")]
+		public global::System.Collections.Generic.IEnumerable<global::Vendr.MeetUp.Demo.CMSModels.Feature> Features => this.Value<global::System.Collections.Generic.IEnumerable<global::Vendr.MeetUp.Demo.CMSModels.Feature>>("features");
 
 		///<summary>
-		/// Map Header
+		/// Is Gift Card: Vendr Specific
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
-		[ImplementPropertyType("mapHeader")]
-		public string MapHeader => this.Value<string>("mapHeader");
+		[ImplementPropertyType("isGiftCard")]
+		public bool IsGiftCard => this.Value<bool>("isGiftCard");
 
 		///<summary>
-		/// Page Title: The title of the page, this is also the first text in a google search result. The ideal length is between 40 and 60 characters
+		/// Photos
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
-		[ImplementPropertyType("pageTitle")]
-		public string PageTitle => this.Value<string>("pageTitle");
+		[ImplementPropertyType("photos")]
+		public global::Umbraco.Core.Models.PublishedContent.IPublishedContent Photos => this.Value<global::Umbraco.Core.Models.PublishedContent.IPublishedContent>("photos");
 
 		///<summary>
-		/// Keywords: Keywords that describe the content of the page. This is considered optional since most modern search engines don't use this anymore
+		/// Product Name
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
-		[ImplementPropertyType("keywords")]
-		public global::System.Collections.Generic.IEnumerable<string> Keywords => global::Vendr.MeetUp.Demo.CMSModels.NavigationBase.GetKeywords(this);
+		[ImplementPropertyType("productName")]
+		public string ProductName => this.Value<string>("productName");
 
 		///<summary>
-		/// Description: A brief description of the content on your page. This text is shown below the title in a google search result and also used for Social Sharing Cards. The ideal length is between 130 and 155 characters
+		/// Product Services
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
-		[ImplementPropertyType("seoMetaDescription")]
-		public string SeoMetaDescription => global::Vendr.MeetUp.Demo.CMSModels.NavigationBase.GetSeoMetaDescription(this);
+		[ImplementPropertyType("productServices")]
+		public bool ProductServices => this.Value<bool>("productServices");
 
 		///<summary>
-		/// Hide in Navigation: If you don't want this page to appear in the navigation, check this box
+		/// Price: Vendr specific
 		///</summary>
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
-		[ImplementPropertyType("umbracoNavihide")]
-		public bool UmbracoNavihide => global::Vendr.MeetUp.Demo.CMSModels.NavigationBase.GetUmbracoNavihide(this);
+		[ImplementPropertyType("price")]
+		public global::Vendr.Web.Models.PricePropertyValue Price => global::Vendr.MeetUp.Demo.CMSModels.ProductConfig.GetPrice(this);
+
+		///<summary>
+		/// Sku: Vendr specific
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
+		[ImplementPropertyType("sku")]
+		public string Sku => global::Vendr.MeetUp.Demo.CMSModels.ProductConfig.GetSku(this);
+
+		///<summary>
+		/// Stock: Vendr specific
+		///</summary>
+		[global::System.CodeDom.Compiler.GeneratedCodeAttribute("Umbraco.ModelsBuilder.Embedded", "8.9.1")]
+		[ImplementPropertyType("stock")]
+		public global::System.Nullable<decimal> Stock => global::Vendr.MeetUp.Demo.CMSModels.ProductConfig.GetStock(this);
 	}
 }

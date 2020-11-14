@@ -468,6 +468,7 @@
     <Compile Include="Models\CMSModels\ProductVariant.generated.cs" />
     <Compile Include="Models\CMSModels\Redirect.generated.cs" />
     <Compile Include="Models\CMSModels\Register.generated.cs" />
+    <Compile Include="Models\CMSModels\SomeOtherProductType.generated.cs" />
     <Compile Include="Models\ExtendedCMSModels\Cart.cs" />
     <Compile Include="Models\ExtendedCMSModels\CheckoutConfirmation.cs" />
     <Compile Include="Models\ExtendedCMSModels\CheckoutPayment.cs" />

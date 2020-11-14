@@ -1,0 +1,79 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.SomeOtherProductType>
+@using Vendr.Core
+@using Vendr.MeetUp.Demo.Core.Controllers
+@using Vendr.MeetUp.Demo.Core.Extensions
+@using ContentModels = Vendr.MeetUp.Demo.CMSModels;
+@{
+    Layout = "master.cshtml";
+    var productAdded = TempData["productAdded"]?.ToString();
+    var productName = TempData["productName"]?.ToString(); 
+}
+<!-- for the section we want to show the shop header -->
+@Html.Partial("~/Views/Partials/SectionHeader.cshtml", Model.Parent)
+
+<section class="section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="product-image-container">
+                    <img class="product-image" src="@Model.Photos.Url" alt="@Model.ProductName image" />
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h1>@Model.ProductName</h1>
+                <div class="product-teaser">@Model.Description</div>
+            @using (Html.BeginUmbracoForm<CartSurfaceController>("AddToCart", FormMethod.Post))
+            {
+                
+                    <div class="product-price">@Model.CalculatePrice().Formatted()</div>
+                    @Html.Hidden("ProductReference", Model.GetProductReference())
+               
+                <div class="input-group">
+                    @Html.TextBox("Quantity", 1, new {type = "number"})
+                </div>
+                <div class="product-button">
+                    <button type="submit" class="button button--border--solid">Buy</button>
+                </div>
+            }
+                <div class="product-advantages">
+                    @if (Model.Features != null)
+                    {
+                        foreach (var feature in Model.Features)
+                        {
+            <div class="product-advantage">
+                <h4>@feature.GetProperty("featureName").Value()</h4>
+                <h5>@feature.GetProperty("featureDetails").Value()</h5>
+            </div>}
+                        }
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="section section--sand">
+    <div class="container">
+        <!-- todo: Check if grid is empty via a property value converter -->
+        @Html.GetGridHtml(Model, "bodyText", "bootstrap3-fluid")
+    </div>
+</section>
+
+
+@section Footer {
+    @if (!productAdded.IsNullOrWhiteSpace() && !productName.IsNullOrWhiteSpace())
+    {
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Toastify({
+                    text: '@productName' + " successfully added to cart",
+                    duration: 3000,
+                    gravity: "top", // `top` or `bottom`
+                    position: 'center', // `left`, `center` or `right`
+                    backgroundColor: "#33830b",
+                    className: "",
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
+                    destination: '@Umbraco.ContentSingleAtXPath("//home/cart").Url',
+                    newWindow:false
+                }).showToast();
+            });
+        </script>}
+}

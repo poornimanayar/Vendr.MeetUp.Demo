@@ -30,3 +30,7 @@ Vendr.MeetUp.Demo.Web/App_Data/Logs/
 Vendr.MeetUp.Demo.Web/App_Data/TEMP/
 
 Vendr.MeetUp.Demo.Web/obj/
+
+Vendr.MeetUp.Demo.Web/App_Data/cache/
+
+Vendr.MeetUp.Demo.Web/uSync/v8/Content

@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Mvc;
 using Vendr.Core;
@@ -19,6 +18,7 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
         //Vendr Order Service
         private readonly IOrderService _orderService;
 
+        //inject the UnitOfWorkProvider instance
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
         private readonly ILogger _logger;
@@ -45,6 +45,7 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
         {
             try
             {
+                //a single uow for a block of write operations, not one uow per write operation
                 using (var uow = _unitOfWorkProvider.Create())
                 {
                     //get the current store
@@ -67,7 +68,7 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
                     TempData["productAdded"] = true;
                     TempData["productReference"] = addToCartViewModel.ProductReference;
                     
-                    //complete the unit of work
+                    //complete the unit of work, this persists the operation into the db
                     uow.Complete();
                 }
             }
@@ -77,7 +78,6 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
                 _logger.Error<CartSurfaceController>(ex.Message);
                 return CurrentUmbracoPage();
             }
-
 
             return RedirectToCurrentUmbracoPage();
         }
