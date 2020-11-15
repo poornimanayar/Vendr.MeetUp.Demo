@@ -154,7 +154,7 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
                             },
 
                             {"comments", model.Comments},
-                            {"giftWrap", model.GiftWrap? "1" : "0"},
+                            {"giftWrap", model.GiftWrap? "Yes" : "No"},
                             {"giftMessage", model.GiftMessage}
                         })
                         .SetPaymentCountryRegion(model.BillingAddress.Country, null) //set the payment country of the order
@@ -162,6 +162,7 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
                             (model.ShippingSameAsBilling ? model.BillingAddress.Country : model.ShippingAddress.Country),
                             null); //set shipping country of the order
 
+                    
                     if (model.GiftWrap)
                     {
                         //gift wrap service, added as a zero value product

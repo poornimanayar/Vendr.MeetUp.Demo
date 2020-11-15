@@ -1,5 +1,62 @@
 ﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.Register>
+@using Vendr.MeetUp.Demo.Core.Controllers
 @using ContentModels = Vendr.MeetUp.Demo.CMSModels;
 @{
-	Layout = null;
+    Layout = "master.cshtml";
 }
+@Html.Partial("~/Views/Partials/SectionHeader.cshtml", Model)
+<section class="section">
+    <div class="container">
+        <div class="row">
+            @using (Html.BeginUmbracoForm<AccountSurfaceController>("RegisterUser", FormMethod.Post))
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="input-group">
+                            <input name="Email" type="email" placeholder="Email" required/>
+                        </div>
+                        <div class="input-group">
+                            <input name="Password" type="password" placeholder="Password" required/>
+                        </div>
+                        <div class="input-group">
+                            <input name="ConfirmPassword" type="password" placeholder="Confirm Password" required/>
+                        </div>
+                        <label class="flex items-center mb-2  cursor-pointer">
+                            <input name="MarketingOptIn" type="checkbox" value="true" class="mr-2"/> Keep me up to date on news and exclusive offers
+                        </label>
+                        <div class="input-group">
+                            <input name="FirstName" type="text" placeholder="First name" required/>
+                        </div>
+                        <div class="input-group">
+                            <input name="LastName" type="text" placeholder="Last name" required/>
+                        </div>
+                        <div class="input-group">
+                            <input name="AddressLine1" type="text" placeholder="Address (line 1)" required/>
+                        </div>
+                        <div class="input-group">
+                            <input name="AddressLine2" type="text" placeholder="Address (line 2)"/>
+                        </div>
+                        <div class="input-group">
+                            <input name="City" type="text" placeholder="City" required/>
+                        </div>
+                        <div class="input-group">
+                            <select name="Country" placeholder="Country">
+                                @foreach (var country in Model.Countries)
+                                {
+                                    <option value="@(country.Id)">@(country.Name)</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="input-group">
+                            <input name="PostCode" type="text" placeholder="Postcode" required/>
+                        </div>
+                        <div class="input-group">
+                            <input name="Telephone" type="text" placeholder="Phone"/>
+                        </div>
+                        <button type="submit" class="button btn-action" >Register</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>

@@ -1,4 +1,5 @@
-﻿using System.Web.Mvc;
+﻿using System.Linq;
+using System.Web.Mvc;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Mvc;
 using Vendr.Core;
@@ -34,7 +35,10 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
         [ChildActionOnly]
         public ActionResult CartCount()
         {
+            //get the current store
             var store = CurrentPage.GetStore();
+
+            //use the session manager to get the current order (readonly entity)
             var currentOrder = _sessionManager.GetCurrentOrder(store.Id);
 
             return this.PartialView("Shop/CartCount", currentOrder?.TotalQuantity ?? 0);
@@ -134,7 +138,7 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
                     //gets the writable order entity
                     var order = _sessionManager.GetCurrentOrder(store.Id)
                         .AsWritable(uow);
-
+                    
                     foreach (var lineItem in order.OrderLines)
                     {
                         order.RemoveOrderLine(lineItem.Id);
@@ -173,8 +177,8 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
                     var order = _sessionManager.GetOrCreateCurrentOrder(store.Id)
                         .AsWritable(uow)
                         .RemoveOrderLine(lineItem.OrderLineId);
-
-                    //save the order
+                    
+                   //save the order
                     _orderService.SaveOrder(order);
 
                     //saving product name for notification

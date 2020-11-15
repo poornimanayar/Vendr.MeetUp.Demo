@@ -1,5 +1,29 @@
 ﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.Login>
+@using Vendr.MeetUp.Demo.Core.Controllers
 @using ContentModels = Vendr.MeetUp.Demo.CMSModels;
+
 @{
-	Layout = null;
+	Layout = "master.cshtml";
 }
+@Html.Partial("~/Views/Partials/SectionHeader.cshtml", Model)
+<section class="section">
+	<div class="container">
+		<div class="row">
+			@using (Html.BeginUmbracoForm<AccountSurfaceController>("Login", FormMethod.Post))
+			{
+				<div class="row">
+					<div class="col-md-12">
+						<div class="input-group">
+							<input name="Username" type="email" placeholder="Email" required/>
+						</div>
+						<div class="input-group">
+							<input name="Password" type="password" placeholder="Password" required/>
+						</div>
+                        
+						<button type="submit" class="button btn-action" >Login</button>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+</section>

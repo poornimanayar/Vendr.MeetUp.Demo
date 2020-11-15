@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Vendr.Core.Models;
 using Vendr.MeetUp.Demo.Core.Extensions;
 

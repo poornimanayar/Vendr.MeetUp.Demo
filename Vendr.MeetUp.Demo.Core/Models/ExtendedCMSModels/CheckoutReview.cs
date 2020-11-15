@@ -1,5 +1,4 @@
-﻿using Vendr.Core.Api;
-using Vendr.Core.Models;
+﻿using Vendr.Core.Models;
 using Vendr.MeetUp.Demo.Core.Extensions;
 
 namespace Vendr.MeetUp.Demo.CMSModels

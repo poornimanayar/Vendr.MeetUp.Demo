@@ -1,5 +1,51 @@
 ﻿@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.Account>
+@using Vendr.MeetUp.Demo.Core.Controllers
 @using ContentModels = Vendr.MeetUp.Demo.CMSModels;
 @{
-	Layout = null;
+	Layout = "master.cshtml";
+	var orderLinked = TempData["orderLinked"]?.ToString(); 
+}
+
+@Html.Partial("~/Views/Partials/SectionHeader.cshtml", Model)
+<section class="section">
+	<div class="container">
+		<div class="row">
+			@Html.Action("GetMemberOrders","AccountSurface")
+		</div>
+		<div class="row">
+			<h2>Missing an order? Link your order to your account</h2>
+			@using (Html.BeginUmbracoForm<AccountSurfaceController>("LinkOrder", FormMethod.Post))
+			{
+				<div class="row">
+					<div class="col-md-12">
+						<div class="input-group">
+							<input name="OrderNumber" placeholder="OrderNumber" required/>
+						</div>
+						
+						<button type="submit" class="button btn-action">Link Order</button>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+</section>
+
+@section Footer {
+	@if (!orderLinked.IsNullOrWhiteSpace())
+	{
+		<script>
+            document.addEventListener('DOMContentLoaded', function () {
+                Toastify({
+                    text: "Order linked successfully",
+                    duration: 3000,
+                    gravity: "top", // `top` or `bottom`
+                    position: 'center', // `left`, `center` or `right`
+                    backgroundColor: "#33830b",
+                    className: "",
+                    stopOnFocus: true, // Prevents dismissing of toast on hover
+                    destination: '@Umbraco.ContentSingleAtXPath("//home/cart").Url',
+                    newWindow:false
+                }).showToast();
+            });
+</script>}
 }

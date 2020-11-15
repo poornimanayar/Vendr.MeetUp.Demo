@@ -29,7 +29,7 @@ namespace Vendr.MeetUp.Demo.Core.Extensions
 
         //gets the content as a Vendr product using the product reference.
         //VendrApi is a singleton access to Vendr Api
-        //Instance gets the IVendrApi
+        //.Instance gets the IVendrApi
         public static IProductSnapshot AsVendrProduct(this IPublishedContent content)
         {
             return VendrApi.Instance.GetProduct(content.GetProductReference());
@@ -94,6 +94,12 @@ namespace Vendr.MeetUp.Demo.Core.Extensions
         public static OrderReadOnly GetFinalisedOrder(this IPublishedContent content)
         {
             return VendrApi.Instance.GetCurrentFinalizedOrder(content.GetStore().Id);
+        }
+        
+        public static List<string> GetGiftCardProductReferences(this IPublishedContent content)
+        {
+            return content.GetHome().FirstChild<Products>().FirstChild<Product>(c => c.IsGiftCard).Children
+                .Select(v => v.Key.ToString()).ToList();
         }
     }
 }

@@ -10,7 +10,7 @@
             <th>Order Number</th>
             <th>Order Date</th>
             <th>Total Price</th>
-            <th>Order Status</th>
+            <th>Shipping Status</th>
         </tr>
         </thead>
         @foreach (var order in Model)
@@ -19,7 +19,7 @@
                 <td>@order.OrderNumber</td>
                 <td>@order.FinalizedDate.Value.ToString("dd/MM/yyyy")</td>
                 <td>@order.TotalPrice.WithDiscounts.Formatted()</td>
-                <td>@(!order.Properties.ContainsKey("shippingStatus") ? "Not available" : order.Properties["shippingStatus"].Value.ToString())</td>
+                <td>@(!order.Properties.ContainsKey("shippingStatus") ? "Not available" : order.Properties["shippingStatus"].Value)</td>
             </tr>
         }
     </table>
