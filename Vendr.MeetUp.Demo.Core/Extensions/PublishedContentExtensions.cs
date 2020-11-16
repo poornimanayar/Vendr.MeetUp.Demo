@@ -86,6 +86,13 @@ namespace Vendr.MeetUp.Demo.Core.Extensions
             return VendrApi.Instance.GetShippingMethods(content.GetStore().Id).ToList();
         }
         
+        public static IEnumerable<PaymentMethodReadOnly> GetPaymentMethods(this IPublishedContent content)
+        {
+            return VendrApi.Instance.GetPaymentMethods(content.GetStore().Id);
+        }
+        
+        
+        
         public static IEnumerable<CountryReadOnly> GetCountries(this IPublishedContent content)
         {
             return VendrApi.Instance.GetCountries(content.GetStore().Id).ToList();

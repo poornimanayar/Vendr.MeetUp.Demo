@@ -9,6 +9,6 @@ namespace Vendr.MeetUp.Demo.CMSModels
 		
 		public IEnumerable<PaymentMethodReadOnly> PaymentMethods => VendrApi.Instance.GetPaymentMethods(this.GetStore().Id);
 		
-		public virtual OrderReadOnly Order => this.GetCurrentOrder();
+		public OrderReadOnly Order => this.GetCurrentOrder();
 	}
 }

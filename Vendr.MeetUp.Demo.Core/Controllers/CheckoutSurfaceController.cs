@@ -107,7 +107,6 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
                         {
                             {Constants.Properties.Customer.EmailPropertyAlias, model.Email},
                             {"marketingOptIn", model.MarketingOptIn ? "1" : "0"},
-
                             {Constants.Properties.Customer.FirstNamePropertyAlias, model.BillingAddress.FirstName},
                             {Constants.Properties.Customer.LastNamePropertyAlias, model.BillingAddress.LastName},
                             {"billingAddressLine1", model.BillingAddress.Line1},
@@ -233,6 +232,7 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
                 using (var uow = _unitOfWorkProvider.Create())
                 {
                     var store = CurrentPage.GetStore();
+                    
                     var order = _sessionManager.GetOrCreateCurrentOrder(store.Id)
                         .AsWritable(uow)
                         .SetPaymentMethod(model.PaymentMethod);
