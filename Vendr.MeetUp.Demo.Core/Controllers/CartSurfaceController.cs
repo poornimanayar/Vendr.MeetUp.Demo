@@ -1,11 +1,14 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web.Mvc;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Mvc;
 using Vendr.Core;
 using Vendr.Core.Exceptions;
 using Vendr.Core.Services;
 using Vendr.Core.Session;
+using Vendr.MeetUp.Demo.Core.Discounts;
 using Vendr.MeetUp.Demo.Core.Extensions;
 using Vendr.MeetUp.Demo.Core.Models.ViewModels;
 
@@ -19,19 +22,22 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
         //Vendr Order Service
         private readonly IOrderService _orderService;
 
+        private readonly IDiscountService _discountService;
+
         //inject the UnitOfWorkProvider instance
         private readonly IUnitOfWorkProvider _unitOfWorkProvider;
 
         private readonly ILogger _logger;
 
-        public CartSurfaceController(ISessionManager sessionManager, IOrderService orderService, IUnitOfWorkProvider unitOfWorkProvider, ILogger logger)
+        public CartSurfaceController(ISessionManager sessionManager, IOrderService orderService, IUnitOfWorkProvider unitOfWorkProvider, ILogger logger, IDiscountService discountService)
         {
             _sessionManager = sessionManager;
             _orderService = orderService;
             _unitOfWorkProvider = unitOfWorkProvider;
             _logger = logger;
+            _discountService = discountService;
         }
-        
+
         [ChildActionOnly]
         public ActionResult CartCount()
         {
@@ -44,7 +50,7 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
             return this.PartialView("Shop/CartCount", currentOrder?.TotalQuantity ?? 0);
         }
 
-        
+
         public ActionResult AddToCart(AddToCartViewModel addToCartViewModel)
         {
             try
@@ -62,16 +68,80 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
                     var order = _sessionManager.GetOrCreateCurrentOrder(store.Id)
                         .AsWritable(uow);
 
-                     order.AddProduct(addToCartViewModel.ProductReference.ToString(), addToCartViewModel.Quantity);
+                    order.AddProduct(addToCartViewModel.ProductReference.ToString(), addToCartViewModel.Quantity);// auto add product discount
+
+
+                    if (order.Discounts != null)
+                    {
+
+                        foreach (var orderDiscount in order.Discounts)
+                        {
+                            var discount = _discountService.GetDiscount(orderDiscount.DiscountId);
+
+                            var rewards = discount.Rewards;
+
+                            if (rewards != null && rewards.Any())
+                            {
+                                var automaticAddProductReward = rewards.FirstOrDefault(r => r.RewardProviderAlias == "automaticAddProductReward");
+
+                                if (automaticAddProductReward != null)
+                                {
+                                    var automaticAddProductRewardSettings = automaticAddProductReward.Settings;
+
+                                    if (automaticAddProductRewardSettings.ContainsKey("nodeId"))
+                                    {
+                                        var productReference = automaticAddProductRewardSettings["nodeId"].Replace("umb://document/", string.Empty);
+
+                                        //Vendr stores guid as a string while the Udi in Umbraco doesnt have the Guid hyphens 
+                                        if (!order.OrderLines.Any(o => o.ProductReference == Guid.Parse(productReference).ToString()))
+                                        {
+                                            order.AddProduct(productReference, 1);
+                                        }
+                                    }
+                                }
+
+                            }
+
+                        }
+                    }
+
+
+                    //var autoAddProductDiscount = _discountService.GetDiscount(Guid.Parse("1bb55388-b142-42c6-a573-0287a2df8508"));
+                    //if (order.Discounts != null && order.Discounts.Any(o => o.DiscountId == autoAddProductDiscount.Id))
+                    //{
+                    //    var rewards = autoAddProductDiscount.Rewards;
+
+                    //    if (rewards != null && rewards.Any())
+                    //    {
+                    //        var automaticAddProductReward = rewards.FirstOrDefault(r => r.RewardProviderAlias == "automaticAddProductReward");
+
+                    //        if (automaticAddProductReward != null)
+                    //        {
+                    //            var automaticAddProductRewardSettings = automaticAddProductReward.Settings;
+
+                    //            if (automaticAddProductRewardSettings.ContainsKey("nodeId"))
+                    //            {
+                    //                var productReference = automaticAddProductRewardSettings["nodeId"].Replace("umb://document/", string.Empty);
+
+                    //                //Vendr stores guid as a string while the Udi in Umbraco doesnt have the Guid hyphens 
+                    //                if (order.OrderLines.FirstOrDefault(o => o.ProductReference == productReference) == null)
+                    //                {
+                    //                    order.AddProduct(productReference, 1);
+                    //                }
+                    //            }
+                    //        }
+
+                    //    }
+                    //}
 
                     //save the order
-                    _orderService.SaveOrder(order);
 
+                    _orderService.SaveOrder(order);
                     //saving product name for notification
                     TempData["productName"] = product.Name;
                     TempData["productAdded"] = true;
                     TempData["productReference"] = addToCartViewModel.ProductReference;
-                    
+
                     //complete the unit of work, this persists the operation into the db
                     uow.Complete();
                 }
@@ -85,7 +155,7 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
 
             return RedirectToCurrentUmbracoPage();
         }
-        
+
         [HttpPost]
         public ActionResult UpdateCart(UpdateCartViewModel updateCart)
         {
@@ -138,7 +208,7 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
                     //gets the writable order entity
                     var order = _sessionManager.GetCurrentOrder(store.Id)
                         .AsWritable(uow);
-                    
+
                     foreach (var lineItem in order.OrderLines)
                     {
                         order.RemoveOrderLine(lineItem.Id);
@@ -177,8 +247,8 @@ namespace Vendr.MeetUp.Demo.Core.Controllers
                     var order = _sessionManager.GetOrCreateCurrentOrder(store.Id)
                         .AsWritable(uow)
                         .RemoveOrderLine(lineItem.OrderLineId);
-                    
-                   //save the order
+
+                    //save the order
                     _orderService.SaveOrder(order);
 
                     //saving product name for notification

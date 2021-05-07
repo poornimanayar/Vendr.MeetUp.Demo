@@ -32,7 +32,7 @@ namespace Vendr.MeetUp.Demo.Core.Extensions
         //.Instance gets the IVendrApi
         public static IProductSnapshot AsVendrProduct(this IPublishedContent content)
         {
-            return VendrApi.Instance.GetProduct(content.GetProductReference());
+            return VendrApi.Instance.GetProduct(content.GetProductReference(),"en-US");
         }
 
         public static Price CalculatePrice(this IPublishedContent content)

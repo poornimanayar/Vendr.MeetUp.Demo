@@ -40,99 +40,112 @@
                                 <th></th>
                                 </thead>
                                 <tbody>
-                                @* loop through the orderlines and add an index *@
-                                @foreach (var item in Model.Order.OrderLines.Select((ol, i) => new {OrderLine = ol, Index = i}))
-                                {
-                                    // get the node
-                                    var node = Umbraco.Content(Guid.Parse(item.OrderLine.ProductReference));
+                                    @* loop through the orderlines and add an index *@
+                                    @foreach (var item in Model.Order.OrderLines.Select((ol, i) => new { OrderLine = ol, Index = i }))
+                                    {
+                                        // get the node
+                                        var node = Umbraco.Content(Guid.Parse(item.OrderLine.ProductReference));
 
-                                    //get the product node
-                                    var product = node.ContentType.Alias == Product.ModelTypeAlias ? (Product) node : (Product) node.Parent;
+                                        //get the product node
+                                        var product = node.ContentType.Alias == Product.ModelTypeAlias ? (Product)node : (Product)node.Parent;
 
-                                    //get the product variant node
-                                    var productVariant = node.ContentType.Alias == ProductVariant.ModelTypeAlias ? (ProductVariant) node : null;
+                                        //get the product variant node
+                                        var productVariant = node.ContentType.Alias == ProductVariant.ModelTypeAlias ? (ProductVariant)node : null;
 
-                                    //get the display name in the format product name - variant name (sku)/ product name (sku)
-                                    var displayName = productVariant != null ? string.Concat(product.ProductName, "- ", productVariant.Name, "(", productVariant.Sku, ")") : string.Concat(product.ProductName, "(", product.Sku, ")");
+                                        //get the display name in the format product name - variant name (sku)/ product name (sku)
+                                        var displayName = productVariant != null ? string.Concat(product.ProductName, "- ", productVariant.Name, "(", productVariant.Sku, ")") : string.Concat(product.ProductName, "(", product.Sku, ")");
 
+                                        <tr>
+                                            <td style="width: 20%;text-align: left">
+                                                <img src="@Url.GetCropUrl(product.Photos.Url, 100, 100)" />
+                                            </td>
+                                            <td style="width: 40%;text-align: left">
+                                                <span style="width: 100%">@displayName</span>
+                                            </td>
+                                            <td style="width: 10%;text-align: left">
+                                                @* unit price without discounts *@
+                                                <span>@item.OrderLine.UnitPrice.WithoutAdjustments.Formatted()</span>
+                                            </td>
+                                            <td style="width: 12%;text-align: left">
+                                                @Html.Hidden($"orderLines[{item.Index}].LineItemId", item.OrderLine.Id)
+                                                @Html.TextBox($"orderLines[{item.Index}].Quantity", item.OrderLine.Quantity.Normalize(), new { type = "number", @class = "input-sm" })
+                                            </td>
+                                            <td style="width: 10%;text-align: left">
+                                                @* show total price without discounts *@
+                                                <span> @item.OrderLine.TotalPrice.WithoutAdjustments.Formatted()</span>
+                                            </td>
+                                            <td style="width: 5%;text-align: left">
+                                                <a href="@(Url.SurfaceAction<CartSurfaceController>("RemoveFromCart", new {OrderLineId = item.OrderLine.Id, ProductName = displayName}))">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    }
+                                    <tr style="border-top:solid 1px #666;border-bottom:solid 1px #666">
+
+                                        <td colspan="1">
+                                            &nbsp;
+                                        </td>
+                                        <td colspan="3">
+                                            <h3>Total Cost</h3>
+                                        </td>
+                                        <td colspan="2">
+                                            @* total price of the order without discounts *@
+                                            <span>@Model.Order.TotalPrice.WithoutAdjustments.Formatted()</span>
+                                        </td>
+                                    </tr>
+                                    <tr style="border-top:solid 1px #666;border-bottom:solid 1px #666">
+
+                                        <td colspan="1">
+                                            &nbsp;
+                                        </td>
+                                        <td colspan="3">
+                                            <h3>Total Price With Discounts</h3>
+                                        </td>
+                                        <td colspan="2">
+                                            @* total price of the order without discounts *@
+                                            <span>@Model.Order.TotalPrice.Value.Formatted()</span>
+                                        </td>
+                                    </tr>
                                     <tr>
-                                        <td style="width: 20%;text-align: left">
-                                            <img src="@Url.GetCropUrl(product.Photos.Url, 100, 100)"/>
+
+                                        <td colspan="4">&nbsp;</td>
+
+                                        <td colspan="2">
+                                            &nbsp;
                                         </td>
-                                        <td style="width: 40%;text-align: left">
-                                            <span style="width: 100%">@displayName</span>
+                                    </tr>
+                                    <tr>
+
+                                        <td>
+                                            <a class="button btn-danger" href="@(Url.SurfaceAction<CartSurfaceController>("EmptyCart"))">
+                                                <span class="icon">
+                                                    <i class="fas fa-minus-circle"></i>
+                                                </span>
+                                                <span>
+                                                    Empty cart
+                                                </span>
+                                            </a>
                                         </td>
-                                        <td style="width: 10%;text-align: left">
-                                            @* unit price without discounts *@
-                                            <span>@item.OrderLine.UnitPrice.WithoutDiscounts.Formatted()</span>
+                                        <td colspan="2">&nbsp;</td>
+                                        <td>
+                                            <button class="button btn-update" type="submit">
+                                                <span class="icon">
+                                                    <i class="fas fa-sync"></i>
+                                                </span>
+                                                <span>Update</span>
+                                            </button>
                                         </td>
-                                        <td style="width: 12%;text-align: left">
-                                            @Html.Hidden($"orderLines[{item.Index}].LineItemId", item.OrderLine.Id)
-                                            @Html.TextBox($"orderLines[{item.Index}].Quantity", item.OrderLine.Quantity.Normalize(), new {type = "number", @class = "input-sm"})
-                                        </td>
-                                        <td style="width: 10%;text-align: left">
-                                            @* show total price without discounts *@
-                                            <span> @item.OrderLine.TotalPrice.WithoutDiscounts.Formatted()</span>
-                                        </td>
-                                        <td style="width: 5%;text-align: left">
-                                            <a href="@(Url.SurfaceAction<CartSurfaceController>("RemoveFromCart", new {OrderLineId = item.OrderLine.Id, ProductName = displayName}))">
-                                                <i class="fas fa-trash-alt"></i>
+                                        <td>&nbsp;</td>
+                                        <td>
+                                            <a class="button btn-action" href="@Umbraco.ContentSingleAtXPath("//home/checkout").Url">
+                                                <span class="icon">
+                                                    <i class="fas fa-shopping-basket"></i>
+                                                </span>
+                                                <span>Checkout</span>
                                             </a>
                                         </td>
                                     </tr>
-                                }
-                                <tr style="border-top:solid 1px #666;border-bottom:solid 1px #666">
-
-                                    <td colspan="1">
-                                        &nbsp;
-                                    </td>
-                                    <td colspan="3">
-                                        <h3>Total Cost</h3>
-                                    </td>
-                                    <td colspan="2">
-                                        @* total price of the order without discounts *@
-                                        <span>@Model.Order.TotalPrice.WithoutDiscounts.Formatted()</span>
-                                    </td>
-                                </tr>
-                                <tr>
-
-                                    <td colspan="4">&nbsp;</td>
-
-                                    <td colspan="2">
-                                        &nbsp;
-                                    </td>
-                                </tr>
-                                <tr>
-
-                                    <td>
-                                        <a class="button btn-danger" href="@(Url.SurfaceAction<CartSurfaceController>("EmptyCart"))">
-                                            <span class="icon">
-                                                <i class="fas fa-minus-circle"></i>
-                                            </span>
-                                            <span>
-                                                Empty cart
-                                            </span>
-                                        </a>
-                                    </td>
-                                    <td colspan="2">&nbsp;</td>
-                                    <td>
-                                        <button class="button btn-update" type="submit">
-                                            <span class="icon">
-                                                <i class="fas fa-sync"></i>
-                                            </span>
-                                            <span>Update</span>
-                                        </button>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <a class="button btn-action" href="@Umbraco.ContentSingleAtXPath("//home/checkout").Url">
-                                            <span class="icon">
-                                                <i class="fas fa-shopping-basket"></i>
-                                            </span>
-                                            <span>Checkout</span>
-                                        </a>
-                                    </td>
-                                </tr>
                                 </tbody>
                             </table>
                          } 
